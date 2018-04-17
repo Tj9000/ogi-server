@@ -70,20 +70,20 @@ function incomeHandler(request,response){
 
 function getReq(request,response,incomeUrl){
 
-	if(incomeUrl==='/getEveList'){
-		// var query=qs.parse(url.parse(request.url).query);
-		// console.log(query);
-			getEveList(query,function(dataJ){
+	if(incomeUrl==='/getParticipants'){
+		var query=qs.parse(url.parse(request.url).query);
+		console.log(query);
+			getParticipants(query,function(dataJ){
 				// console.log(dataJ);
 				response.writeHead(200,{'Content-Type':'application/JSON'});
 				response.write(JSON.stringify(dataJ));
 				response.end();
 			});
 	}
-	else if(incomeUrl==='/getParticipants'){
+	else if(incomeUrl==='/appendParticipants'){
 		var query=qs.parse(url.parse(request.url).query);
 		console.log(query);
-			getParticipants(query,function(dataJ){
+			insertParticipant(query,function(dataJ){
 				// console.log(dataJ);
 				response.writeHead(200,{'Content-Type':'application/JSON'});
 				response.write(JSON.stringify(dataJ));
@@ -100,24 +100,17 @@ function getReq(request,response,incomeUrl){
 				response.end();
 			});
 	}
-	
-	else if(incomeUrl==='/Authinticitite'){
-		var query=qs.parse(url.parse(request.url).query);
-		console.log(query);
-		AuthUser(query,function(stat,data){
-			response.writeHead(stat);
-			if(stat!=200){
+	else if(incomeUrl==='/getResult'){
+		// var query=qs.parse(url.parse(request.url).query);
+		// console.log(query);
+			getResult(function(dataJ){
+				// console.log(dataJ);
+				response.writeHead(200,{'Content-Type':'application/JSON'});
+				response.write(JSON.stringify(dataJ));
 				response.end();
-			}
-			else{
-				response.writeHead(200,{'Content-Type':'text/plain'});
-				console.log({"PreLvl":data,"UserID":query.Uid,"UserPW":query.pw});
-				response.write(encrypt(JSON.stringify({"PreLvl":data,"UserID":query.Uid,"UserPW":query.pw})));
-				response.end();
-			}
-		});
+			});
 	}
-
+	
 	else{
 		var filepath = process.cwd() + incomeUrl;
 			// console.log(filepath);
@@ -145,9 +138,10 @@ function getReq(request,response,incomeUrl){
 	}	
 }
 
-function getEveList(query,callback){
-	// var inserts=[query.name];
-	connection.query("select * from event",function(err,result,field){
+
+function getParticipants(query,callback){
+	var inserts=[query.eventID];
+	connection.query("select * from participants",inserts,function(err,result,field){
 		// console.log(result);
 		console.log(result);
 		if(err){
@@ -158,10 +152,9 @@ function getEveList(query,callback){
 		}
 	});
 }
-
-function getParticipants(query,callback){
-	var inserts=[query.eventID];
-	connection.query("select * from participants where eventID=?",inserts,function(err,result,field){
+function getResult(callback){
+	// var inserts=[query.eventID];
+	connection.query("SELECT eventID,COUNT(*) as count FROM votes GROUP BY eventID",[],function(err,result,field){
 		// console.log(result);
 		console.log(result);
 		if(err){
@@ -174,11 +167,9 @@ function getParticipants(query,callback){
 }
 
 function castVote(query, callback){
-	var inserts=[query.voterID,query.eventID,query.participantID];
-	connection.query("insert into votes values(?,?,?)",inserts,function(err,result,field){
+	var inserts=[query.eventID];
+	connection.query("insert into votes(eventID, time_) values(?,SYSDATE())",inserts,function(err,result,field){
 		// console.log(result);
-		console.log(err);
-		console.log(result);
 		console.log(field);
 		if(err){
 			callback(err);
@@ -188,47 +179,16 @@ function castVote(query, callback){
 		}
 	});	
 }
-
-function AuthUser(queryJ,callback){
-	var inserts=[queryJ.Uid,queryJ.pw];
-	function CBroll(err){
-			console.log(err);
-			callback(400,"Failed");
-	}
-	connection.beginTransaction(function(err){
+function insertParticipant(query, callback){
+	var inserts=[query.eventID,query.teamname,query.details];
+	connection.query("insert into participants(id,teamname,details) values(?,?,?)",inserts,function(err,result,field){
+		// console.log(result);
+		console.log(field);
 		if(err){
-			callback("Post UnSuccessful",404,"Transaction failed to initiate");
+			callback(err);
 		}
 		else{
-			connection.query("set @status=0",function(err,result){
-				if(err)
-					return connection.rollback(CBroll(err));
-			});
-
-			connection.query("call getUSER(?,?,@status)",inserts,function(err,result){
-				if(err)
-					return connection.rollback(CBroll(err));
-			});
-
-			connection.query("select PreLvl,@status as stat from Users where UserID=\""+queryJ.Uid+"\"",function(err,result,field){
-				if(err)
-					return connection.rollback(CBroll(err));
-				else{
-					console.log(result);
-					connection.commit(function(err){
-						if(err){
-							callback("Post UnSuccessful",400,"Commit Failed");
-						}
-						else{
-							if( result.length==0 || result[0].stat==0)
-								callback(201,"X");
-							else
-								callback(200,result[0].PreLvl);
-						}
-					});	
-				}
-			});	
+			callback(result);
 		}
-	});
+	});	
 }
-

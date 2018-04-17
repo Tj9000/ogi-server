@@ -1,6 +1,6 @@
-const 	dbUser  = 'loki',
-		dbPw	= 'accessDenide',
-		database= "OGI";
+const 	dbUser  = 'rims',
+		dbPw	= 'mrogibear',
+		database= "OGIFEST";
 
 module.exports ={
 	dbUser,

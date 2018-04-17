@@ -1,0 +1,24 @@
+{
+  "name": "ogi-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "mysql": "^2.15.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tj9000/ogi-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tj9000/ogi-server/issues"
+  },
+  "homepage": "https://github.com/Tj9000/ogi-server#readme"
+}

@@ -1,0 +1,5 @@
+CREATE USER 'rims'@'localhost' IDENTIFIED BY 'mrogibear';
+create database OGIFEST;
+GRANT ALL PRIVILEGES ON OGIFEST.* TO "rims"@"localhost";
+create table participants (id int primary key, teamname varchar(40), details varchar(100));
+create table votes (voter varchar(10), eventID int, FOREIGN KEY (eventID) references participants(id), time_ DATETIME);
