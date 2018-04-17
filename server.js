@@ -59,7 +59,7 @@ function incomeHandler(request,response){
 	console.log(incomeUrl);
 	// console.log(url.parse(request.url));
 	if(incomeUrl=== '/' || incomeUrl==="/index"){   	//Default redirects to index page
-		incomeUrl="/index.html";
+		incomeUrl="/login.html";
 	}
 	else if(incomeUrl==='/server.js'){
 		incomeUrl='/accessDenied.html';
