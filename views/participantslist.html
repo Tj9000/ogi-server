@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Participant List Update</title>
+	<meta charset="utf-8">
+	<script type="text/javascript" src='loginX.js'></script>
+
+	<script type="text/javascript">
+		var AdvShow= true;
+		var toggleDel= false;	//true = delete
+		function getRes(){
+			document.getElementById('inpErrMsg').innerHTML=""
+			document.getElementById('totalParticipants').innerHTML='loading';
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET','/getParticipants',true),
+			xhr.send();
+			xhr.onreadystatechange=function(){
+				if(xhr.readyState == 4){
+					if(xhr.status = 200){
+						var dataJ=JSON.parse(xhr.responseText);
+						console.log(dataJ);
+						document.getElementById('totalParticipants').innerHTML=dataJ.length;
+
+						populateTable(dataJ);
+						return dataJ
+					}
+					else if(xhr.status == 401){
+						window.location.href="/login.html"
+					}
+					else console.log(xhr.status)
+				}
+			}
+		}
+		function populateTable(dataJ){
+			// var tableDiv=document.getElementById(res);
+			var tbl = document.getElementById("ParticipantTable");
+				tbl.innerHTML='';
+				var tblBody = document.createElement("tbody");
+				
+					var row = document.createElement("tr");
+					
+					var cell=document.createElement("th");
+					eveId= document.createTextNode('ID' );
+					cell.appendChild(eveId);
+					row.appendChild(cell);
+
+					var cell=document.createElement("th");
+					eveName= document.createTextNode('TEAM NAME');
+					cell.appendChild(eveName);
+					row.appendChild(cell);
+					
+					var cell=document.createElement("th");
+					count= document.createTextNode('COUNT');
+					cell.appendChild(count);
+					row.appendChild(cell);
+
+
+					tblBody.appendChild(row);
+
+
+				for(var i=0;i<dataJ.length;i++){
+		
+					var row = document.createElement("tr");
+					
+					var cell=document.createElement("td");
+					eveId= document.createTextNode(dataJ[i].id );
+					cell.appendChild(eveId);
+					row.appendChild(cell);
+
+					var cell=document.createElement("td");
+					teamName= document.createTextNode(dataJ[i].teamname);
+					cell.appendChild(teamName);
+					row.appendChild(cell);
+					
+					var cell=document.createElement("td");
+					count= document.createTextNode(dataJ[i].details);
+					cell.appendChild(count);
+					row.appendChild(cell);
+
+
+					tblBody.appendChild(row);
+					
+					}
+					
+				tbl.appendChild(tblBody);
+		}
+		window.onload=function(){
+			document.getElementById('inpErrMsg').innerHTML=""
+			ToggleAdvanced();
+			ToggleDelUPD();
+			getRes();
+		}
+
+		function addParticipant(){
+			var ID = document.getElementById('inpID').value;
+			var TeamName = document.getElementById('inpTeamName').value;
+			var Detail = document.getElementById('inpDetail').value;
+			document.getElementById('inpErrMsg').innerHTML="";
+
+			if(!ID.length || !TeamName.length || !Detail.length){
+				document.getElementById('inpErrMsg').innerHTML="Enter All Fields";
+				return;
+
+			}
+			var xhr2 = new XMLHttpRequest();
+			xhr2.open('GET','/appendParticipants?eventID='+ID+'&teamname='+TeamName+'&details='+Detail+'&Token='+Session.get('userLogin'),true),
+			xhr2.send();
+			xhr2.onreadystatechange=function(){
+				if(xhr2.readyState == 4){
+					if(xhr2.status == 200){
+						// console.log(dataJ);
+						getRes();
+					}
+					else if(xhr2.status == 401){
+						alert("Un Authenticated")
+						window.location.href="/login.html"
+					}
+					else{
+						console.log(xhr2.status)
+						document.getElementById('inpErrMsg').innerHTML="Error occured while updating - Check Duplicate ID entry";
+					}
+				}
+			}
+		}
+		function ToggleAdvanced(){
+			AdvShow=!AdvShow;
+			if(AdvShow){	//now Show
+				document.getElementById('AdvTab').style.display=''
+			}
+			else{			////now hide
+				document.getElementById('AdvTab').style.display='none'
+			}
+		}
+		function ToggleDelUPD(){
+			toggleDel=!toggleDel;
+			if(toggleDel){	//now Show delete
+				document.getElementById('delBar').style.display=''
+				document.getElementById('updBar').style.display='none'
+			}
+			else{			////now show update
+				document.getElementById('delBar').style.display='none'
+				document.getElementById('updBar').style.display=''
+			}
+		}
+		function updateParticipant(){
+			
+		}
+		function delParticipant(){
+
+		}
+	</script>
+
+	<style type="text/css">
+		th ,td {
+			text-align: center;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Participants</h1>
+	<div>
+		<BUTTON onclick="getRes()">Refresh</BUTTON> Total Participants: <span id="totalParticipants">-</span>
+		<div>
+			<table id="ParticipantTable" border="border">
+				
+			</table>
+		</div>
+	</div>
+	<br><br>
+	<div>
+		Add Participant:<br>
+		<input type="text" maxLength='3' placeholder='ID' id='inpID'>
+		<input type="text" maxLength='40' placeholder='TeamName' id='inpTeamName'>
+		<input type="text" maxLength='100' placeholder='Details' id='inpDetail'>
+		<BUTTON onclick="addParticipant()">Add</BUTTON>
+
+		<div id="inpErrMsg" style="color:red">
+		</div>
+	</div>
+	<br><br>
+	<BUTTON onclick="ToggleAdvanced()">Show Advanced Options >></BUTTON>
+	<div id="AdvTab">
+		<BUTTON onclick="ToggleDelUPD()">toggle Delete/Update</BUTTON>
+		<span id="delBar">
+			Event ID:		<input type="text" maxLength='3' placeholder='ID' id='delID'>
+			<BUTTON onclick="delParticipant()">Add</BUTTON>
+		</span>
+		<span id="updBar"><br>
+			Existing ID to Update: <input type="text" maxLength='3' placeholder='ID' id='updExistingID'><br>
+			Changes:<br>
+			Event ID:<input type="text" maxLength='3' placeholder='ID' id='updID'>
+			TeamName:<input type="text" maxLength='40' placeholder='TeamName' id='updTeamName'>
+			Detail:  <input type="text" maxLength='100' placeholder='Details' id='updDetail'>
+			<BUTTON onclick="updateParticipant()">UPDATE</BUTTON>
+		</span>
+	</div>
+</body>
+</html>

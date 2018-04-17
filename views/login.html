@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login - TriWizard Tournament</title>
+	<meta charset="utf-8">
+	<script type="text/javascript" src='loginX.js'></script>
+	<script type="text/javascript" src='login.js'></script>
+</head>
+<body >
+<div>
+	<img src="Bckg.jpg" style="width:100%">
+	<p id="main">TriWizard</p>
+	<div id="mainDiv">
+		<table>
+			<tr><td>Team Name :</td><td> <input type="text" id="UserLoginTN" class="infoTA">	</td></tr>
+		</table>
+		<button onclick="Login()">Login</button>
+		<br>Use your login ID, and then register with your team name
+		
+		<br>Make sure not to use spaces in team name
+	
+	</div>
+
+</div>
+</body>
+<style>
+		.infoTA {
+		height: 20px;
+		resize: none;
+	}
+	#mainDiv {
+		position: absolute;
+		left: 40vw;
+		color: red;
+		top: 40vh;
+		font-weight: bold;
+		/*background-color: aqua;*/
+	}
+	#main{
+		position: absolute;
+		top: 20vh;
+		left: 45vw;
+		font-size: 40px;
+		color: red;
+		font-style: oblique;
+/*font-variant: titling-caps;*/
+	font-weight: bold;
+	}
+</style>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Results</title>
+	<meta charset="utf-8">
+
+	<script type="text/javascript">
+		function getRes(){
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET','/getResult',true),
+			xhr.send();
+			xhr.onreadystatechange=function(){
+				if(xhr.readyState == 4){
+					if(xhr.status = 200){
+						var dataJ=JSON.parse(xhr.responseText);
+						console.log(dataJ);
+						populateTable(dataJ);
+						return dataJ
+					}
+					else console.log(xht.readyState)
+				}
+			}
+		}
+		function populateTable(dataJ){
+			// var tableDiv=document.getElementById(res);
+			var tbl = document.getElementById("resTbl");
+				tbl.innerHTML='';
+				var tblBody = document.createElement("tbody");
+				
+					var row = document.createElement("tr");
+					
+					var cell=document.createElement("th");
+					eveId= document.createTextNode('ID' );
+					cell.appendChild(eveId);
+					row.appendChild(cell);
+
+					// var cell=document.createElement("th");
+					// eveName= document.createTextNode('TEAM NAME');
+					// cell.appendChild(eveName);
+					// row.appendChild(cell);
+					
+					var cell=document.createElement("th");
+					count= document.createTextNode('COUNT');
+					cell.appendChild(count);
+					row.appendChild(cell);
+
+
+					tblBody.appendChild(row);
+
+
+				for(var i=0;i<dataJ.length;i++){
+		
+					var row = document.createElement("tr");
+					
+					var cell=document.createElement("td");
+					eveId= document.createTextNode(dataJ[i].eventID );
+					cell.appendChild(eveId);
+					row.appendChild(cell);
+
+					// var cell=document.createElement("td");
+					// eveName= document.createTextNode(dataJ[i].eventName);
+					// cell.appendChild(eveName);
+					// row.appendChild(cell);
+					
+					var cell=document.createElement("td");
+					count= document.createTextNode(dataJ[i].count);
+					cell.appendChild(count);
+					row.appendChild(cell);
+
+
+					tblBody.appendChild(row);
+					
+					}
+					
+				tbl.appendChild(tblBody);
+		}
+		window.onload=function(){
+			getRes();
+		}
+	</script>
+
+	<style type="text/css">
+		th ,td {
+			text-align: center;
+			padding-left: 5px;
+			padding-right: 5px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Results</h1>
+	<div>
+		<BUTTON onclick="getRes()">Refresh</BUTTON>
+		<div id="res">
+			<table id="resTbl" border="border">
+				
+			</table>
+		</div>
+	</div>
+
+</body>
+</html>

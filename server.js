@@ -46,6 +46,12 @@ function decrypt(text){
   return dec;
 }
 
+function Authentic(ip){
+	if(ip!='undefined' && decrypt(ip)=='securePassword')
+		return true;
+	else
+		return false;
+}
 
 function incomeHandler(request,response){
 	var incomeUrl=url.parse(request.url).pathname;
@@ -70,7 +76,21 @@ function incomeHandler(request,response){
 
 function getReq(request,response,incomeUrl){
 
-	if(incomeUrl==='/getParticipants'){
+	if(incomeUrl==='/Authinticitite'){
+		var query=qs.parse(url.parse(request.url).query);
+		let pw = query.TN;
+		if(pw=='rinnegan'){
+				response.writeHead(200,{'Content-Type':'text/html'});
+				response.write(encrypt('securePassword'));
+				response.end();
+		}
+		else{
+				response.writeHead(400);
+				// response.write();
+				response.end();
+		}
+	}
+	else if(incomeUrl==='/getParticipants'){
 		var query=qs.parse(url.parse(request.url).query);
 		console.log(query);
 			getParticipants(query,function(dataJ){
@@ -82,13 +102,19 @@ function getReq(request,response,incomeUrl){
 	}
 	else if(incomeUrl==='/appendParticipants'){
 		var query=qs.parse(url.parse(request.url).query);
+		if(Authentic(query.Token)){
 		console.log(query);
-			insertParticipant(query,function(dataJ){
+			insertParticipant(query,function(status,dataJ){
 				// console.log(dataJ);
-				response.writeHead(200,{'Content-Type':'application/JSON'});
+				response.writeHead(status,{'Content-Type':'application/JSON'});
 				response.write(JSON.stringify(dataJ));
 				response.end();
 			});
+		}
+		else{
+			response.writeHead(401)
+			response.end();
+		}
 	}
 	else if(incomeUrl==='/vote'){
 		var query=qs.parse(url.parse(request.url).query);
@@ -112,8 +138,8 @@ function getReq(request,response,incomeUrl){
 	}
 	
 	else{
-		var filepath = process.cwd() + incomeUrl;
-			// console.log(filepath);
+		var filepath = process.cwd() +'/views'+ incomeUrl;
+			console.log(filepath);
 			fs.exists(filepath,function(ExistFlag){			//Check if file exists
 					if(ExistFlag){
 						fs.readFile(filepath,function(err,file){		//check if there is any error reading the file
@@ -185,10 +211,10 @@ function insertParticipant(query, callback){
 		// console.log(result);
 		console.log(field);
 		if(err){
-			callback(err);
+			callback(409,err);
 		}
 		else{
-			callback(result);
+			callback(200,result);
 		}
 	});	
 }
